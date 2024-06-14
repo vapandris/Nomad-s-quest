@@ -1,0 +1,151 @@
+pub const Vec2 = struct {
+    x: f32,
+    y: f32,
+
+    const ZERO = Vec2{ .x = 0, .y = 0 };
+
+    pub fn getDistance(self: Vec2) f32 {
+        return sqrt(sq(self.x) + sq(self.y));
+    }
+
+    pub fn getNormal(self: Vec2) Vec2 {
+        if (self.x == 0 and self.y == 0) unreachable;
+
+        const distance = self.getDistance();
+        return .{
+            .x = self.x / distance,
+            .y = self.y / distance,
+        };
+    }
+};
+
+pub const Pos2 = Vec2;
+
+/// Force num between min and max.
+/// - If min < num < max -> return num
+/// - If max < num -> return max
+/// - If min > num -> return min
+pub fn clamp(num: f32, min: f32, max: f32) f32 {
+    if (min > max) unreachable;
+
+    return @max(min, @min(max, num));
+}
+
+/// Square of `num`
+pub fn sq(num: f32) f32 {
+    return num * num;
+}
+
+/// Fast square root approximation by John Carmack
+/// https://en.wikipedia.org/wiki/Fast_inverse_square_root
+pub fn sqrt(num: f32) f32 {
+    if (num < 0) unreachable;
+
+    var i: i32 = undefined;
+    var x: f32 = undefined;
+    var y: f32 = undefined;
+
+    x = num * 0.5;
+    y = num;
+    i = @as(*i32, @ptrCast(&y)).*;
+    i = 0x5f3759df - (i >> 1);
+    y = @as(*f32, @ptrCast(&i)).*;
+    y = y * (1.5 - (x * y * y));
+    y = y * (1.5 - (x * y * y));
+
+    return num * y;
+}
+
+/// Fast random number generator by Lehmer
+/// https://en.wikipedia.org/wiki/Lehmer_random_number_generator
+pub fn rand() u64 {
+    if (!initialized) unreachable;
+
+    s = s +% 0xe120fc15;
+
+    // Short for magic
+    var M: u64 = s *% 0x4a39b70d;
+    const m1: u64 = (M >> 32) ^ M;
+    M = m1 *% 0x12fad5c9;
+    const m2: u64 = (M >> 32) ^ M;
+
+    return m2;
+}
+
+/// Short for seed
+/// Is used to generate random numbers
+var s: u64 = undefined;
+var initialized = false;
+
+/// Is used to initialize the Lehmer random number generator
+/// Not calling this before using `rand` is undefined behavior
+pub fn seed(newSeed: u64) void {
+    s = newSeed;
+    initialized = true;
+}
+
+// ==========================================================================
+const testing = @import("std").testing;
+const FLOAT_TOLERANCE = 0.001;
+
+test "clamp" {
+    const min = -2;
+    const max = 15;
+
+    for (0..40) |i| {
+        const num = @as(f32, @floatFromInt(i)) - 20;
+
+        const result = if (min > num) min else if (max < num) max else num;
+
+        try testing.expectApproxEqRel(result, clamp(num, min, max), FLOAT_TOLERANCE);
+    }
+}
+
+test "sq" {
+    // Test on range:
+    for (0..300) |i| {
+        const num = @as(f32, @floatFromInt(i)) - 150;
+        try testing.expectApproxEqRel(num * num, sq(num), FLOAT_TOLERANCE);
+    }
+
+    // Test randomly picked values:
+    try testing.expectApproxEqRel(0, sq(0), FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(25, sq(5), FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(25, sq(-5), FLOAT_TOLERANCE);
+}
+
+test "sqrt" {
+    for (0..300) |i| {
+        const num: f32 = @floatFromInt(i);
+        try testing.expectApproxEqRel(@sqrt(num), sqrt(num), FLOAT_TOLERANCE);
+    }
+
+    // Test randomly picked values:
+    try testing.expectApproxEqRel(0, sqrt(0), FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(1, sqrt(1), FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(1.41421, sqrt(2), FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(3.1622, sqrt(10), FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(5, sqrt(25), FLOAT_TOLERANCE);
+}
+
+test "vec2_normal" {
+    // Test randomly picked vectors:
+    const v1 = Vec2{ .x = 3, .y = 4 };
+    const n1 = v1.getNormal();
+    try testing.expectApproxEqRel(0.6, n1.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(0.8, n1.y, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(1, n1.getDistance(), FLOAT_TOLERANCE);
+
+    const v2 = Vec2{ .x = 3000, .y = -4000 };
+    const n2 = v2.getNormal();
+    try testing.expectApproxEqRel(n1.x, n2.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(-n1.y, n2.y, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(1, n2.getDistance(), FLOAT_TOLERANCE);
+
+    const v3 = Vec2{ .x = 1, .y = 0 };
+    const n3 = v3.getNormal();
+    try testing.expectApproxEqRel(1, v3.getDistance(), FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(v3.x, n3.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(v3.y, n3.y, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(1, n3.getDistance(), FLOAT_TOLERANCE);
+}

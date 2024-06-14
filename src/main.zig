@@ -21,5 +21,5 @@ pub fn main() anyerror!void {
 const testing = std.testing;
 
 test "main" {
-    try testing.expect(true);
+    _ = @import("Base/math.zig");
 }
