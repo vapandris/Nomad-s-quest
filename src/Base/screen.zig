@@ -16,6 +16,7 @@ pub fn getScreenSize() Size {
 const Camera = struct {
     rect: Rect,
 
+    /// Instantly move the camera to set the midle of the camera on `pos`
     pub fn focusOn(self: *Camera, pos: Pos2) void {
         const midleOfCamera = self.rect.getMidPoint();
 
@@ -25,9 +26,6 @@ const Camera = struct {
         self.*.rect.pos.y += delta.y;
     }
 
-    /// Contains information to draw a rectangle on the screen.
-    /// It is returned by `Camera` when figuring out where to draw a rectangle in the game.
-    // Should only be used when it is returned, thus it is not public.
     const ScreenRect = struct {
         pos: struct { x: i32, y: i32 },
         size: struct { w: i32, h: i32 },
@@ -35,7 +33,7 @@ const Camera = struct {
     /// Function shall calculate where to draw the given `gameRect` based on the position of `self: Camera` and the `screenSize`
     /// - Function does not check if the returned `ScreenRect` will be inside the screen or not
     /// - Function's `screenSize` argument should be the result of the function: `getScreenSize()`
-    // getScreenSize() is not in the internal of the function because than it would be harder to test.
+    // getScreenSize() is not in the internal of the function to make testing possible.
     pub fn ScreenRectFromRect(self: Camera, gameRect: Rect, screenSize: Size) ScreenRect {
         if (self.rect.size.w <= 0 or self.rect.size.h <= 0) unreachable;
 
@@ -51,6 +49,23 @@ const Camera = struct {
                 .w = @intFromFloat(@ceil(gameRect.size.w * widthScale)),
                 .h = @intFromFloat(@ceil(gameRect.size.h * heightScale)),
             },
+        };
+    }
+
+    /// Is used to figure out where a mouse-click happend in the game's world.
+    /// - Function shall calculate where the screen input `x` and `y` happened in the game world
+    /// - Function's `screenPos` argument should be the result of the function: `rl.getMousePosition()`
+    /// - Function's `screenSize` argument should be the result of the function: `getScreenSize()`
+    // getScreenSize() is not in the internal of the function to make testing possible.
+    pub fn Pos2FromScreenPos(self: Camera, screenPos: rl.Vector2, screenSize: Size) Pos2 {
+        if (self.rect.size.w <= 0 or self.rect.size.h <= 0) unreachable;
+
+        const widthScale = screenSize.w / self.rect.size.w;
+        const heightScale = screenSize.h / self.rect.size.h;
+
+        return .{
+            .x = (screenPos.x / widthScale) + self.rect.pos.x,
+            .y = (screenPos.y / heightScale) + self.rect.pos.y,
         };
     }
 };
@@ -85,7 +100,7 @@ test "camera_focus_on" {
     }
 }
 
-test "camera_calculate_screen_rect" {
+test "camera_draw_location" {
     const screenSize = Size{ .w = 800, .h = 450 };
     var camera = Camera{ .rect = .{
         .pos = .{ .x = 0, .y = 0 },
@@ -123,4 +138,39 @@ test "camera_calculate_screen_rect" {
     try testing.expectEqual(@as(i32, @intFromFloat(r1.pos.y / 2)), screenRect.pos.y);
     try testing.expectEqual(@as(i32, @intFromFloat(r1.size.w / 2)), screenRect.size.w);
     try testing.expectEqual(@as(i32, @intFromFloat(r1.size.h / 2)), screenRect.size.h);
+}
+
+test "camera_mouse_click" {
+    const screenSize = Size{ .w = 800, .h = 450 };
+    var camera = Camera{ .rect = .{
+        .pos = .{ .x = 0, .y = 0 },
+        .size = .{
+            .w = 800,
+            .h = 450,
+        },
+    } };
+
+    var mousePos = rl.Vector2{ .x = 0, .y = 0 };
+    var pos = camera.Pos2FromScreenPos(mousePos, screenSize);
+
+    try testing.expectApproxEqRel(mousePos.x, pos.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(mousePos.y, pos.y, FLOAT_TOLERANCE);
+
+    mousePos.x = 20;
+    mousePos.y = 50;
+    pos = camera.Pos2FromScreenPos(mousePos, screenSize);
+    try testing.expectApproxEqRel(mousePos.x, pos.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(mousePos.y, pos.y, FLOAT_TOLERANCE);
+
+    camera.rect.pos.x += 100;
+    camera.rect.pos.y -= 30;
+    pos = camera.Pos2FromScreenPos(mousePos, screenSize);
+    try testing.expectApproxEqRel(120, pos.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(20, pos.y, FLOAT_TOLERANCE);
+
+    camera.rect.size.w /= 2;
+    camera.rect.size.h /= 2;
+    pos = camera.Pos2FromScreenPos(mousePos, screenSize);
+    try testing.expectApproxEqRel(110, pos.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(-5, pos.y, FLOAT_TOLERANCE);
 }
