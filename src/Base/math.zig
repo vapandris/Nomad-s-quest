@@ -22,12 +22,18 @@ pub const Vec2 = struct {
         };
     }
 
+    pub fn getVectorTo(start: Pos2, end: Pos2) Vec2 {
+        return .{
+            .x = end.x - start.x,
+            .y = end.y - start.y,
+        };
+    }
+
     /// Return the distance between `p1` and `p2`
     pub fn getDistance(p1: Pos2, p2: Pos2) f32 {
-        return getLength(.{
-            .x = p1.x - p2.x,
-            .y = p1.y - p2.y,
-        });
+        return getLength(
+            p1.getVectorTo(p2),
+        );
     }
 };
 
@@ -192,6 +198,44 @@ test "pos_distance" {
     const p4 = Pos2{ .x = -1, .y = -11 };
 
     try testing.expectApproxEqRel(10, p3.getDistance(p4), FLOAT_TOLERANCE);
+}
+
+test "vector_to" {
+    const p1 = Pos2{ .x = -98.0076, .y = 731.7009 };
+    const v1 = p1.getVectorTo(p1);
+
+    try testing.expectApproxEqRel(0.0, v1.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(0.0, v1.y, FLOAT_TOLERANCE);
+
+    const v2 = Pos2.getVectorTo(
+        .{ .x = 0, .y = 0 },
+        .{ .x = 123.5, .y = -346.075 },
+    );
+
+    try testing.expectApproxEqRel(123.5, v2.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(-346.075, v2.y, FLOAT_TOLERANCE);
+
+    const v3 = Pos2.getVectorTo(
+        .{ .x = -10, .y = 0 },
+        .{ .x = 10, .y = 0 },
+    );
+    const v4 = Pos2.getVectorTo(
+        .{ .x = 10, .y = 0 },
+        .{ .x = -10, .y = 0 },
+    );
+    const v5 = Pos2.getVectorTo(
+        .{ .x = -1, .y = -11 },
+        .{ .x = 7, .y = -5 },
+    );
+
+    try testing.expectApproxEqRel(20, v3.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(0, v3.y, FLOAT_TOLERANCE);
+
+    try testing.expectApproxEqRel(-20, v4.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(0, v4.y, FLOAT_TOLERANCE);
+
+    try testing.expectApproxEqRel(8, v5.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(6, v5.y, FLOAT_TOLERANCE);
 }
 
 test "vec2_normal" {

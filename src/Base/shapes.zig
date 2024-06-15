@@ -46,8 +46,6 @@ pub const Circle = struct {
 
         const distanceFromRect = Pos2.getDistance(circle.pos, collisionPoint);
 
-        @import("std").debug.print("\ncP: {d} {d}\nd: {d}\n", .{ collisionPoint.x, collisionPoint.y, distanceFromRect });
-
         return distanceFromRect < circle.r;
     }
 };
