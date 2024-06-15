@@ -23,4 +23,5 @@ const testing = std.testing;
 test "main" {
     _ = @import("Base/math.zig");
     _ = @import("Base/shapes.zig");
+    _ = @import("Base/screen.zig");
 }

@@ -11,6 +11,13 @@ pub const Size = struct { w: f32, h: f32 };
 pub const Rect = struct {
     pos: Pos2,
     size: Size,
+
+    pub fn getMidPoint(self: Rect) Pos2 {
+        return .{
+            .x = self.pos.x + (self.size.w / 2),
+            .y = self.pos.y + (self.size.h / 2),
+        };
+    }
 };
 
 pub const Circle = struct {
@@ -107,4 +114,21 @@ test "circle_overlap_rect" {
 
     try testing.expect(circle.isOverlapingRect(r3) == true);
     try testing.expect(circle.isOverlapingRect(r4) == true);
+}
+
+test "rect_mid_point" {
+    const r1 = Rect{
+        .pos = .{ .x = 0, .y = 0 },
+        .size = .{ .w = 0, .h = 0 },
+    };
+    const r2 = Rect{
+        .pos = .{ .x = -1, .y = -1 },
+        .size = .{ .w = 2, .h = 2 },
+    };
+
+    try testing.expectApproxEqRel(r1.pos.x, r1.getMidPoint().x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(r1.pos.y, r1.getMidPoint().y, FLOAT_TOLERANCE);
+
+    try testing.expectApproxEqRel(0, r2.getMidPoint().x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(0, r2.getMidPoint().y, FLOAT_TOLERANCE);
 }
