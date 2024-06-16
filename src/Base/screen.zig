@@ -13,7 +13,7 @@ pub fn getScreenSize() Size {
     };
 }
 
-const Camera = struct {
+pub const Camera = struct {
     rect: Rect,
 
     /// Instantly move the camera to set the midle of the camera on `pos`
@@ -66,6 +66,20 @@ const Camera = struct {
         return .{
             .x = (screenPos.x / widthScale) + self.rect.pos.x,
             .y = (screenPos.y / heightScale) + self.rect.pos.y,
+        };
+    }
+
+    /// For debug purposes only:
+    pub fn ScreenCircleFromCircle(self: Camera, circle: shapes.Circle, screenSize: Size) struct { x: i32, y: i32, r: f32 } {
+        if (self.rect.size.w <= 0 or self.rect.size.h <= 0) unreachable;
+
+        const widthScale = screenSize.w / self.rect.size.w;
+        const heightScale = screenSize.h / self.rect.size.h;
+
+        return .{
+            .x = @intFromFloat((circle.pos.x - self.rect.pos.x) * widthScale),
+            .y = @intFromFloat((circle.pos.y - self.rect.pos.y) * heightScale),
+            .r = circle.r * (widthScale / 2 + heightScale / 2),
         };
     }
 };
