@@ -98,9 +98,9 @@ pub fn main() anyerror!void {
         );
 
         // No way I have to do this:
-        cameraPosText.ptr[@intCast(@as(i32, @intCast(cameraPosText.len)) - 1)] = 0;
-        cameraSizeText.ptr[@intCast(@as(i32, @intCast(cameraSizeText.len)) - 1)] = 0;
-        ballPosText.ptr[@intCast(@as(i32, @intCast(ballPosText.len)) - 1)] = 0;
+        cameraPosText.ptr[cameraPosText.len - 1] = 0;
+        cameraSizeText.ptr[cameraSizeText.len - 1] = 0;
+        ballPosText.ptr[ballPosText.len - 1] = 0;
 
         if (cursosBall) |ball| {
             const screenCircle = camera.ScreenCircleFromCircle(ball, screen.getScreenSize());
