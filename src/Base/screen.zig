@@ -164,27 +164,52 @@ test "camera_mouse_click" {
         },
     } };
 
-    var mousePos = rl.Vector2{ .x = 0, .y = 0 };
-    var pos = camera.Pos2FromScreenPos(mousePos, screenSize);
+    const mousePosTopLeft = rl.Vector2{ .x = 0, .y = 0 };
+    const mousePosSomewhere = rl.Vector2{ .x = 20, .y = 70 };
+    const mousePosBotRight = rl.Vector2{ .x = screenSize.w, .y = screenSize.h };
+    var posTopLeft = camera.Pos2FromScreenPos(mousePosTopLeft, screenSize);
+    var posSomewhere = camera.Pos2FromScreenPos(mousePosSomewhere, screenSize);
+    var posBotRight = camera.Pos2FromScreenPos(mousePosBotRight, screenSize);
 
-    try testing.expectApproxEqRel(mousePos.x, pos.x, FLOAT_TOLERANCE);
-    try testing.expectApproxEqRel(mousePos.y, pos.y, FLOAT_TOLERANCE);
+    // When we click at the top-left of the screen (0, 0) we expect that location to mathc with the camera's location:
+    try testing.expectApproxEqRel(camera.rect.pos.x, posTopLeft.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(camera.rect.pos.y, posTopLeft.y, FLOAT_TOLERANCE);
 
-    mousePos.x = 20;
-    mousePos.y = 50;
-    pos = camera.Pos2FromScreenPos(mousePos, screenSize);
-    try testing.expectApproxEqRel(mousePos.x, pos.x, FLOAT_TOLERANCE);
-    try testing.expectApproxEqRel(mousePos.y, pos.y, FLOAT_TOLERANCE);
+    // When we click at any point on the screen, we expext that location to be offsetted by the camera's position and factored with the ration of the screen adn the camera's size
+    try testing.expectApproxEqRel(20, posSomewhere.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(70, posSomewhere.y, FLOAT_TOLERANCE);
+
+    // Clicking on the bottom right corner of the screen is exactly the same as the previous, but it indicates the scaling effect better
+    try testing.expectApproxEqRel(800, posBotRight.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(450, posBotRight.y, FLOAT_TOLERANCE);
 
     camera.rect.pos.x += 100;
     camera.rect.pos.y -= 30;
-    pos = camera.Pos2FromScreenPos(mousePos, screenSize);
-    try testing.expectApproxEqRel(120, pos.x, FLOAT_TOLERANCE);
-    try testing.expectApproxEqRel(20, pos.y, FLOAT_TOLERANCE);
+    posTopLeft = camera.Pos2FromScreenPos(mousePosTopLeft, screenSize);
+    posSomewhere = camera.Pos2FromScreenPos(mousePosSomewhere, screenSize);
+    posBotRight = camera.Pos2FromScreenPos(mousePosBotRight, screenSize);
+
+    try testing.expectApproxEqRel(camera.rect.pos.x, posTopLeft.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(camera.rect.pos.y, posTopLeft.y, FLOAT_TOLERANCE);
+
+    try testing.expectApproxEqRel(100 + 20, posSomewhere.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(-30 + 70, posSomewhere.y, FLOAT_TOLERANCE);
+
+    try testing.expectApproxEqRel(100 + 800, posBotRight.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(-30 + 450, posBotRight.y, FLOAT_TOLERANCE);
 
     camera.rect.size.w /= 2;
     camera.rect.size.h /= 2;
-    pos = camera.Pos2FromScreenPos(mousePos, screenSize);
-    try testing.expectApproxEqRel(110, pos.x, FLOAT_TOLERANCE);
-    try testing.expectApproxEqRel(-5, pos.y, FLOAT_TOLERANCE);
+    posTopLeft = camera.Pos2FromScreenPos(mousePosTopLeft, screenSize);
+    posSomewhere = camera.Pos2FromScreenPos(mousePosSomewhere, screenSize);
+    posBotRight = camera.Pos2FromScreenPos(mousePosBotRight, screenSize);
+
+    try testing.expectApproxEqRel(camera.rect.pos.x, posTopLeft.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(camera.rect.pos.y, posTopLeft.y, FLOAT_TOLERANCE);
+
+    try testing.expectApproxEqRel(100 + (20 / 2), posSomewhere.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(-30 + (70 / 2), posSomewhere.y, FLOAT_TOLERANCE);
+
+    try testing.expectApproxEqRel(100 + (800 / 2), posBotRight.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(-30 + (450 / 2), posBotRight.y, FLOAT_TOLERANCE);
 }
