@@ -21,12 +21,22 @@ pub fn main() anyerror!void {
 
     var cursosBall: ?shapes.Circle = null;
 
+    const pillar1 = shapes.Rect{
+        .pos = .{ .x = 0, .y = 0 },
+        .size = .{ .w = 30, .h = 450 },
+    };
+
+    const pillar2 = shapes.Rect{
+        .pos = .{ .x = 770, .y = 0 },
+        .size = .{ .w = 30, .h = 450 },
+    };
+
     while (!rl.windowShouldClose()) {
         if (rl.isKeyDown(.key_a)) {
-            camera.rect.pos.x -= 50 * rl.getFrameTime();
+            camera.rect.pos.x -= 150 * rl.getFrameTime();
         }
         if (rl.isKeyDown(.key_d)) {
-            camera.rect.pos.x += 50 * rl.getFrameTime();
+            camera.rect.pos.x += 150 * rl.getFrameTime();
         }
 
         if (rl.isKeyDown(.key_c)) {
@@ -43,8 +53,7 @@ pub fn main() anyerror!void {
             camera.rect.size.h += heightDelta;
             camera.rect.pos.x -= widthDelta / 2;
             camera.rect.pos.y -= heightDelta / 2;
-        }
-        if (mouseWheelMovement < 0) { // downwards
+        } else if (mouseWheelMovement < 0 and (camera.rect.size.w > 1 and camera.rect.size.h > 1)) { // downwards
             const widthDelta = (camera.rect.size.w * 1.5) * rl.getFrameTime();
             const heightDelta = (camera.rect.size.h * 1.5) * rl.getFrameTime();
 
@@ -93,15 +102,21 @@ pub fn main() anyerror!void {
         cameraSizeText.ptr[@intCast(@as(i32, @intCast(cameraSizeText.len)) - 1)] = 0;
         ballPosText.ptr[@intCast(@as(i32, @intCast(ballPosText.len)) - 1)] = 0;
 
-        rl.drawText(@ptrCast(cameraPosText), 10, 10, 20, rl.Color.light_gray);
-        rl.drawText(@ptrCast(cameraSizeText), 10, 40, 20, rl.Color.light_gray);
-        rl.drawText(@ptrCast(ballPosText), 10, 70, 20, rl.Color.light_gray);
-
         if (cursosBall) |ball| {
             const screenCircle = camera.ScreenCircleFromCircle(ball, screen.getScreenSize());
 
             rl.drawCircle(screenCircle.x, screenCircle.y, screenCircle.r, rl.Color.black);
         }
+
+        const screenPillar1 = camera.ScreenRectFromRect(pillar1, screen.getScreenSize());
+        const screenPillar2 = camera.ScreenRectFromRect(pillar2, screen.getScreenSize());
+
+        rl.drawRectangle(screenPillar1.pos.x, screenPillar1.pos.y, screenPillar1.size.w, screenPillar1.size.h, rl.Color.black);
+        rl.drawRectangle(screenPillar2.pos.x, screenPillar2.pos.y, screenPillar2.size.w, screenPillar2.size.h, rl.Color.black);
+
+        rl.drawText(@ptrCast(cameraPosText), 10, 10, 20, rl.Color.light_gray);
+        rl.drawText(@ptrCast(cameraSizeText), 10, 40, 20, rl.Color.light_gray);
+        rl.drawText(@ptrCast(ballPosText), 10, 70, 20, rl.Color.light_gray);
     }
 }
 
