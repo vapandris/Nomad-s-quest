@@ -21,6 +21,13 @@ pub const Vec2 = struct {
             .y = self.y / length,
         };
     }
+};
+
+pub const Pos2 = struct {
+    x: f32,
+    y: f32,
+
+    pub const ZERO = Vec2{ .x = 0, .y = 0 };
 
     pub fn getVectorTo(start: Pos2, end: Pos2) Vec2 {
         return .{
@@ -31,13 +38,11 @@ pub const Vec2 = struct {
 
     /// Return the distance between `p1` and `p2`
     pub fn getDistance(p1: Pos2, p2: Pos2) f32 {
-        return getLength(
+        return Vec2.getLength(
             p1.getVectorTo(p2),
         );
     }
 };
-
-pub const Pos2 = Vec2;
 
 /// Force num between min and max.
 /// - If min < num < max -> return num
@@ -192,7 +197,7 @@ test "pos_distance" {
     const p1 = Pos2{ .x = 0.0, .y = 0.0 };
     const p2 = Pos2{ .x = 52.75, .y = 988.01 };
 
-    try testing.expectApproxEqRel(p2.getLength(), Pos2.getDistance(p1, p2), FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(Vec2.getLength(.{ .x = p2.x, .y = p2.y }), Pos2.getDistance(p1, p2), FLOAT_TOLERANCE);
 
     const p3 = Pos2{ .x = 7, .y = -5 };
     const p4 = Pos2{ .x = -1, .y = -11 };
