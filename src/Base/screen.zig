@@ -82,6 +82,21 @@ pub const Camera = struct {
             .r = circle.r * (widthScale / 2 + heightScale / 2),
         };
     }
+
+    const ZoomDirection = enum(i8) {
+        in = -1,
+        out = 1,
+    };
+    /// Parameter `delta` should be raylib's `getFrameTime` function multiplied with a number if wanted zoom to be faster/slower.
+    pub fn zoom(self: *Camera, delta: f32, zoomDirection: ZoomDirection) void {
+        const widthDelta = self.rect.size.w * delta * @as(f32, @floatFromInt(@intFromEnum(zoomDirection)));
+        const heightDelta = self.rect.size.h * delta * @as(f32, @floatFromInt(@intFromEnum(zoomDirection)));
+
+        self.rect.size.w += widthDelta;
+        self.rect.size.h += heightDelta;
+        self.rect.pos.x -= widthDelta / 2;
+        self.rect.pos.y -= heightDelta / 2;
+    }
 };
 
 // ==========================================================================
@@ -212,4 +227,49 @@ test "camera_mouse_click" {
 
     try testing.expectApproxEqRel(100 + (800 / 2), posBotRight.x, FLOAT_TOLERANCE);
     try testing.expectApproxEqRel(-30 + (450 / 2), posBotRight.y, FLOAT_TOLERANCE);
+}
+
+test "camera_zoom" {
+    const delta: f32 = 0.05;
+    var camera = Camera{ .rect = .{
+        .pos = .{ .x = 0, .y = 0 },
+        .size = .{
+            .w = 800,
+            .h = 450,
+        },
+    } };
+
+    for (0..10) |_| {
+        const preZoomMid = camera.rect.getMidPoint();
+        const preZoomX: f32 = camera.rect.pos.x;
+        const preZoomY: f32 = camera.rect.pos.y;
+        const preZoomW: f32 = camera.rect.size.w;
+        const preZoomH: f32 = camera.rect.size.h;
+
+        camera.zoom(delta, .out);
+
+        try testing.expect(camera.rect.pos.x < preZoomX);
+        try testing.expect(camera.rect.pos.y < preZoomY);
+        try testing.expect(preZoomH < camera.rect.size.h);
+        try testing.expect(preZoomW < camera.rect.size.w);
+        try testing.expectApproxEqRel(preZoomMid.x, camera.rect.getMidPoint().x, FLOAT_TOLERANCE);
+        try testing.expectApproxEqRel(preZoomMid.y, camera.rect.getMidPoint().y, FLOAT_TOLERANCE);
+    }
+
+    for (0..10) |_| {
+        const preZoomMid = camera.rect.getMidPoint();
+        const preZoomX: f32 = camera.rect.pos.x;
+        const preZoomY: f32 = camera.rect.pos.y;
+        const preZoomW: f32 = camera.rect.size.w;
+        const preZoomH: f32 = camera.rect.size.h;
+
+        camera.zoom(delta, .in);
+
+        try testing.expect(preZoomX < camera.rect.pos.x);
+        try testing.expect(preZoomY < camera.rect.pos.y);
+        try testing.expect(camera.rect.size.h < preZoomH);
+        try testing.expect(camera.rect.size.w < preZoomW);
+        try testing.expectApproxEqRel(preZoomMid.x, camera.rect.getMidPoint().x, FLOAT_TOLERANCE);
+        try testing.expectApproxEqRel(preZoomMid.y, camera.rect.getMidPoint().y, FLOAT_TOLERANCE);
+    }
 }

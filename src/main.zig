@@ -46,21 +46,9 @@ pub fn main() anyerror!void {
 
         const mouseWheelMovement = rl.getMouseWheelMove();
         if (mouseWheelMovement > 0) { // upwards
-            const widthDelta = (camera.rect.size.w * 1.5) * rl.getFrameTime();
-            const heightDelta = (camera.rect.size.h * 1.5) * rl.getFrameTime();
-
-            camera.rect.size.w += widthDelta;
-            camera.rect.size.h += heightDelta;
-            camera.rect.pos.x -= widthDelta / 2;
-            camera.rect.pos.y -= heightDelta / 2;
+            camera.zoom(rl.getFrameTime() * 1.5, .in);
         } else if (mouseWheelMovement < 0 and (camera.rect.size.w > 1 and camera.rect.size.h > 1)) { // downwards
-            const widthDelta = (camera.rect.size.w * 1.5) * rl.getFrameTime();
-            const heightDelta = (camera.rect.size.h * 1.5) * rl.getFrameTime();
-
-            camera.rect.size.w -= widthDelta;
-            camera.rect.size.h -= heightDelta;
-            camera.rect.pos.x += widthDelta / 2;
-            camera.rect.pos.y += heightDelta / 2;
+            camera.zoom(rl.getFrameTime() * 1.5, .out);
         }
 
         if (rl.isMouseButtonDown(.mouse_button_left)) {
