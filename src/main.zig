@@ -1,113 +1,46 @@
 const rl = @import("raylib");
 const std = @import("std");
 
-const screen = @import("Base/screen.zig");
-const shapes = @import("Base/shapes.zig");
-
 pub fn main() anyerror!void {
     const screenWidth = 800;
     const screenHeight = 450;
 
     rl.initWindow(screenWidth, screenHeight, "raylib-zig [core] example - basic window");
     defer rl.closeWindow();
+
     rl.setTargetFPS(60);
 
-    var camera = screen.Camera{
-        .rect = .{
-            .pos = .{ .x = 0, .y = 0 },
-            .size = .{ .w = 800, .h = 450 },
-        },
-    };
+    const frameCount: f32 = 4;
+    const nomadIdle = rl.loadTexture("assets/nomad-idle-front.png");
+    const frameWidth: f32 = @as(f32, @floatFromInt(nomadIdle.width)) / frameCount;
+    const frameHeight: f32 = @floatFromInt(nomadIdle.height);
+    const frameScaler = 5.0;
+    var frameCounter: f32 = 0;
 
-    var cursosBall: ?shapes.Circle = null;
+    var frameDelayCounter: u32 = 0;
 
-    const pillar1 = shapes.Rect{
-        .pos = .{ .x = 0, .y = 0 },
-        .size = .{ .w = 30, .h = 450 },
-    };
-
-    const pillar2 = shapes.Rect{
-        .pos = .{ .x = 770, .y = 0 },
-        .size = .{ .w = 30, .h = 450 },
-    };
-
-    while (!rl.windowShouldClose()) {
-        if (rl.isKeyDown(.key_a)) {
-            camera.rect.pos.x -= 150 * rl.getFrameTime();
-        }
-        if (rl.isKeyDown(.key_d)) {
-            camera.rect.pos.x += 150 * rl.getFrameTime();
+    while (!rl.windowShouldClose()) : (frameDelayCounter += 1) {
+        // should use a proper timer later.
+        if (frameDelayCounter == 10) {
+            frameDelayCounter = 0;
+            frameCounter += 1.0;
         }
 
-        if (rl.isKeyDown(.key_c)) {
-            if (cursosBall) |ball|
-                camera.focusOn(ball.pos);
-        }
-
-        const mouseWheelMovement = rl.getMouseWheelMove();
-        if (mouseWheelMovement > 0) { // upwards
-            camera.zoom(rl.getFrameTime() * 1.5, .in);
-        } else if (mouseWheelMovement < 0 and (camera.rect.size.w > 1 and camera.rect.size.h > 1)) { // downwards
-            camera.zoom(rl.getFrameTime() * 1.5, .out);
-        }
-
-        if (rl.isMouseButtonDown(.mouse_button_left)) {
-            const mouseScreenPos = rl.getMousePosition();
-            const mouseGamePos = camera.Pos2FromScreenPos(mouseScreenPos, screen.getScreenSize());
-
-            cursosBall = shapes.Circle{
-                .pos = mouseGamePos,
-                .r = 20,
-            };
-        }
         rl.beginDrawing();
         defer rl.endDrawing();
 
         rl.clearBackground(rl.Color.white);
 
-        const cameraPosText = try std.fmt.allocPrint(
-            std.heap.c_allocator,
-            "Camera pos is {d} {d}0",
-            .{ camera.rect.pos.x, camera.rect.pos.y },
+        rl.drawTexturePro(
+            nomadIdle,
+            .{ .x = frameCounter * frameWidth, .y = 0, .width = frameWidth, .height = frameHeight },
+            .{ .x = 10, .y = 10, .width = frameWidth * frameScaler, .height = frameHeight * frameScaler },
+            .{ .x = 32, .y = 0 },
+            0,
+            rl.Color.white,
         );
-        const cameraSizeText = try std.fmt.allocPrint(
-            std.heap.c_allocator,
-            "Camera size is {d} {d}0",
-            .{ camera.rect.size.w, camera.rect.size.h },
-        );
-        const ballPosText = if (cursosBall != null) try std.fmt.allocPrint(
-            std.heap.c_allocator,
-            "Ball pos is {d} {d}0",
-            .{ cursosBall.?.pos.x, cursosBall.?.pos.y },
-        ) else try std.fmt.allocPrint(
-            std.heap.c_allocator,
-            "Ball pos is unknown0",
-            .{},
-        );
-
-        // No way I have to do this:
-        cameraPosText.ptr[@intCast(@as(i32, @intCast(cameraPosText.len)) - 1)] = 0;
-        cameraSizeText.ptr[@intCast(@as(i32, @intCast(cameraSizeText.len)) - 1)] = 0;
-        ballPosText.ptr[@intCast(@as(i32, @intCast(ballPosText.len)) - 1)] = 0;
-
-        if (cursosBall) |ball| {
-            const screenCircle = camera.ScreenCircleFromCircle(ball, screen.getScreenSize());
-
-            rl.drawCircle(screenCircle.x, screenCircle.y, screenCircle.r, rl.Color.black);
-        }
-
-        const screenPillar1 = camera.ScreenRectFromRect(pillar1, screen.getScreenSize());
-        const screenPillar2 = camera.ScreenRectFromRect(pillar2, screen.getScreenSize());
-
-        rl.drawRectangle(screenPillar1.pos.x, screenPillar1.pos.y, screenPillar1.size.w, screenPillar1.size.h, rl.Color.black);
-        rl.drawRectangle(screenPillar2.pos.x, screenPillar2.pos.y, screenPillar2.size.w, screenPillar2.size.h, rl.Color.black);
-
-        rl.drawText(@ptrCast(cameraPosText), 10, 10, 20, rl.Color.light_gray);
-        rl.drawText(@ptrCast(cameraSizeText), 10, 40, 20, rl.Color.light_gray);
-        rl.drawText(@ptrCast(ballPosText), 10, 70, 20, rl.Color.light_gray);
     }
 }
-
 // ==========================================================================
 const testing = std.testing;
 
