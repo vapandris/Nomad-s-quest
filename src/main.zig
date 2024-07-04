@@ -11,7 +11,11 @@ pub fn main() anyerror!void {
     rl.setTargetFPS(60);
 
     const frameCount: f32 = 4;
-    const nomadIdle = rl.loadTexture("assets/nomad-idle-front.png");
+    const nomadIdle = rl.loadTexture("assets/nomad.png");
+
+    if (nomadIdle.id <= 0) {
+        std.debug.panic("COULDN'T OPEN ASSET!!!\n", .{});
+    }
     const frameWidth: f32 = @as(f32, @floatFromInt(nomadIdle.width)) / frameCount;
     const frameHeight: f32 = @floatFromInt(nomadIdle.height);
     const frameScaler = 5.0;
