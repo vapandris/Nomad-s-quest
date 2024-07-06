@@ -78,7 +78,13 @@ const AssetLibrary = struct {
             // If the given animation is already recorded, append to it, if not, create it.
             if (self.map.getEntry(nameId)) |entry| {
                 try entry.value_ptr.append(rec);
-            } else {}
+            } else {
+                var array = AnimationData.init(self.allocator);
+                const key = try self.allocator.alloc(u8, nameId.len);
+                @memcpy(key, nameId);
+                try array.append(rec);
+                try self.map.put(key, array);
+            }
         }
     }
 
@@ -96,5 +102,9 @@ test AssetLibrary {
     defer a.deinit();
 
     try a.parse("assets/nomad.rtpa");
+    var it = a.map.iterator();
+    while (it.next()) |entry| {
+        std.debug.print("{s}: {any}\n", .{ entry.key_ptr.*, entry.value_ptr.*.items });
+    }
     try testing.expect(true);
 }
