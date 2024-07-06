@@ -4,14 +4,14 @@
 # Number of packed sprites:     8
 #
 # Atlas info:    a <imagePath> <width> <height> <spriteCount> <isFont> <fontSize>
-# Sprite info:   s <nameId> <originX> <originY> <positionX> <positionY> <sourceWidth> <sourceHeight> <padding> <trimmed> <trimRecX> <trimRecY> <trimRecWidth> <trimRecHeight> <durationMs>
+# Sprite info:   s <nameId> <originX> <originY> <positionX> <positionY> <sourceWidth> <sourceHeight> <padding> <trimmed> <trimRecX> <trimRecY> <trimRecWidth> <trimRecHeight>
 #
-a atlas.png 128 128 8 0 32
-s nomad-idle-front1 0 0 0 0 32 32 0 0 9 6 14 24 500
-s nomad-idle-front2 0 0 32 0 32 32 0 0 9 6 14 24 100
-s nomad-idle-front3 0 0 64 0 32 32 0 0 9 6 14 24 100
-s nomad-idle-front4 0 0 96 0 32 32 0 0 9 7 14 23 100
-s nomad-idle-back1 0 0 0 32 32 32 0 0 9 6 14 24 500
-s nomad-idle-back2 0 0 32 32 32 32 0 0 9 6 14 24 100
-s nomad-idle-back3 0 0 64 32 32 32 0 0 9 7 14 23 100
-s nomad-idle-back4 0 0 96 32 32 32 0 0 9 7 14 23 100
+a nomad.png 128 128 8 0 32
+s nomad-idle-back1 0 0 0 0 32 32 0 0 9 6 14 24
+s nomad-idle-back2 0 0 32 0 32 32 0 0 9 6 14 24
+s nomad-idle-back3 0 0 64 0 32 32 0 0 9 7 14 23
+s nomad-idle-back4 0 0 96 0 32 32 0 0 9 7 14 23
+s nomad-idle-front1 0 0 0 32 32 32 0 0 9 6 14 24
+s nomad-idle-front2 0 0 32 32 32 32 0 0 9 6 14 24
+s nomad-idle-front3 0 0 64 32 32 32 0 0 9 6 14 24
+s nomad-idle-front4 0 0 96 32 32 32 0 0 9 7 14 23

@@ -52,4 +52,5 @@ test "main" {
     _ = @import("Base/math.zig");
     _ = @import("Base/shapes.zig");
     _ = @import("Base/screen.zig");
+    _ = @import("Base/assets.zig");
 }
