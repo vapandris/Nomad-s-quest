@@ -18,6 +18,11 @@ pub const Rect = struct {
             .y = self.pos.y + (self.size.h / 2),
         };
     }
+
+    pub fn setMidPoint(self: *Rect, mid: Pos2) void {
+        self.pos.x = mid.x - self.size.w / 2;
+        self.pos.y = mid.y - self.size.h / 2;
+    }
 };
 
 pub const Circle = struct {
@@ -132,4 +137,24 @@ test "rect_mid_point" {
 
     try testing.expectApproxEqRel(0, r2.getMidPoint().x, FLOAT_TOLERANCE);
     try testing.expectApproxEqRel(0, r2.getMidPoint().y, FLOAT_TOLERANCE);
+}
+
+test "Rect.setMid" {
+    var mid: Pos2 = undefined;
+    var r1 = Rect{
+        .pos = undefined,
+        .size = .{ .w = 10, .h = 24 },
+    };
+
+    r1.setMidPoint(.{ .x = -10, .y = 20 });
+    mid = r1.getMidPoint();
+
+    try testing.expectApproxEqRel(-10, mid.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(20, mid.y, FLOAT_TOLERANCE);
+
+    r1.setMidPoint(.{ .x = 0, .y = 0 });
+    mid = r1.getMidPoint();
+
+    try testing.expectApproxEqRel(0, mid.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(0, mid.y, FLOAT_TOLERANCE);
 }

@@ -1,12 +1,12 @@
 #
 # rTexPacker atlas descriptor file (v2.0)
 #
-# Number of packed sprites:     12
+# Number of packed sprites:     16
 #
 # Atlas info:    a <imagePath> <width> <height> <spriteCount> <isFont> <fontSize>
 # Sprite info:   s <nameId> <originX> <originY> <positionX> <positionY> <sourceWidth> <sourceHeight> <padding> <trimmed> <trimRecX> <trimRecY> <trimRecWidth> <trimRecHeight>
 #
-a nomad.png 128 128 12 0 32
+a nomad.png 128 128 16 0 32
 s nomad-idle-back1 0 0 0 0 32 32 0 0 9 6 14 24
 s nomad-idle-back2 0 0 32 0 32 32 0 0 9 6 14 24
 s nomad-idle-back3 0 0 64 0 32 32 0 0 9 7 14 23
@@ -19,3 +19,7 @@ s nomad-idle-side1 0 0 0 64 32 32 0 0 11 6 9 24
 s nomad-idle-side2 0 0 32 64 32 32 0 0 11 6 9 24
 s nomad-idle-side3 0 0 64 64 32 32 0 0 11 6 9 24
 s nomad-idle-side4 0 0 96 64 32 32 0 0 11 7 9 23
+s nomad-run-front1 0 0 0 96 32 32 0 0 9 7 14 24
+s nomad-run-front2 0 0 32 96 32 32 0 0 9 6 14 25
+s nomad-run-front3 0 0 64 96 32 32 0 0 9 6 14 25
+s nomad-run-front4 0 0 96 96 32 32 0 0 9 7 14 24

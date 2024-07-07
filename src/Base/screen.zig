@@ -26,29 +26,21 @@ pub const Camera = struct {
         self.*.rect.pos.y += delta.y;
     }
 
-    const ScreenRect = struct {
-        pos: struct { x: i32, y: i32 },
-        size: struct { w: i32, h: i32 },
-    };
     /// Function shall calculate where to draw the given `gameRect` based on the position of `self: Camera` and the `screenSize`
     /// - Function does not check if the returned `ScreenRect` will be inside the screen or not
     /// - Function's `screenSize` argument should be the result of the function: `getScreenSize()`
     // getScreenSize() is not in the internal of the function to make testing possible.
-    pub fn ScreenRectFromRect(self: Camera, gameRect: Rect, screenSize: Size) ScreenRect {
+    pub fn ScreenRectFromRect(self: Camera, gameRect: Rect, screenSize: Size) rl.Rectangle {
         if (self.rect.size.w <= 0 or self.rect.size.h <= 0) unreachable;
 
         const widthScale = screenSize.w / self.rect.size.w;
         const heightScale = screenSize.h / self.rect.size.h;
 
         return .{
-            .pos = .{
-                .x = @intFromFloat(@ceil((gameRect.pos.x - self.rect.pos.x) * widthScale)),
-                .y = @intFromFloat(@ceil((gameRect.pos.y - self.rect.pos.y) * heightScale)),
-            },
-            .size = .{
-                .w = @intFromFloat(@ceil(gameRect.size.w * widthScale)),
-                .h = @intFromFloat(@ceil(gameRect.size.h * heightScale)),
-            },
+            .x = (gameRect.pos.x - self.rect.pos.x) * widthScale,
+            .y = (gameRect.pos.y - self.rect.pos.y) * heightScale,
+            .width = gameRect.size.w * widthScale,
+            .height = gameRect.size.h * heightScale,
         };
     }
 
@@ -145,28 +137,28 @@ test "camera_draw_location" {
     };
     var screenRect = camera.ScreenRectFromRect(r1, screenSize);
 
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.pos.x)), screenRect.pos.x);
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.pos.y)), screenRect.pos.y);
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.size.w)), screenRect.size.w);
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.size.h)), screenRect.size.h);
+    try testing.expectApproxEqRel(r1.pos.x, screenRect.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(r1.pos.y, screenRect.y, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(r1.size.w, screenRect.width, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(r1.size.h, screenRect.height, FLOAT_TOLERANCE);
 
     camera.rect.size.w /= 2;
     camera.rect.size.h /= 2;
     screenRect = camera.ScreenRectFromRect(r1, screenSize);
 
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.pos.x * 2)), screenRect.pos.x);
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.pos.y * 2)), screenRect.pos.y);
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.size.w * 2)), screenRect.size.w);
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.size.h * 2)), screenRect.size.h);
+    try testing.expectApproxEqRel(r1.pos.x * 2, screenRect.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(r1.pos.y * 2, screenRect.y, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(r1.size.w * 2, screenRect.width, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(r1.size.h * 2, screenRect.height, FLOAT_TOLERANCE);
 
     camera.rect.size.w *= 4;
     camera.rect.size.h *= 4;
     screenRect = camera.ScreenRectFromRect(r1, screenSize);
 
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.pos.x / 2)), screenRect.pos.x);
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.pos.y / 2)), screenRect.pos.y);
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.size.w / 2)), screenRect.size.w);
-    try testing.expectEqual(@as(i32, @intFromFloat(r1.size.h / 2)), screenRect.size.h);
+    try testing.expectApproxEqRel(r1.pos.x / 2, screenRect.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(r1.pos.y / 2, screenRect.y, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(r1.size.w / 2, screenRect.width, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(r1.size.h / 2, screenRect.height, FLOAT_TOLERANCE);
 }
 
 test "camera_mouse_click" {

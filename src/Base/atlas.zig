@@ -1,16 +1,16 @@
 const std = @import("std");
 const rl = @import("raylib");
 
-const AnimationData = std.ArrayList(rl.Rectangle);
+pub const AnimationFrames = std.ArrayList(rl.Rectangle);
 
 pub const AtlasLibrary = struct {
-    map: std.StringHashMap(AnimationData),
+    map: std.StringHashMap(AnimationFrames),
     allocator: std.mem.Allocator,
 
     pub fn init(allocator: std.mem.Allocator) AtlasLibrary {
         return .{
             .allocator = allocator,
-            .map = std.StringHashMap(AnimationData).init(allocator),
+            .map = std.StringHashMap(AnimationFrames).init(allocator),
         };
     }
 
@@ -78,7 +78,7 @@ pub const AtlasLibrary = struct {
             if (self.map.getEntry(nameId)) |entry| {
                 try entry.value_ptr.append(rec);
             } else {
-                var array = AnimationData.init(self.allocator);
+                var array = AnimationFrames.init(self.allocator);
                 const key = try self.allocator.alloc(u8, nameId.len);
                 @memcpy(key, nameId);
                 try array.append(rec);
