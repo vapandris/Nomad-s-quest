@@ -1,5 +1,6 @@
 const rl = @import("raylib");
 const std = @import("std");
+const assets = @import("Base/assets.zig");
 
 pub fn main() anyerror!void {
     const screenWidth = 800;
@@ -10,25 +11,33 @@ pub fn main() anyerror!void {
 
     rl.setTargetFPS(60);
 
-    const frameCount: f32 = 4;
-    const nomadIdle = rl.loadTexture("assets/nomad.png");
+    const nomadSprite = rl.loadTexture("assets/nomad.png");
 
-    if (nomadIdle.id <= 0) {
+    if (nomadSprite.id <= 0) {
         std.debug.panic("COULDN'T OPEN ASSET!!!\n", .{});
     }
-    const frameWidth: f32 = @as(f32, @floatFromInt(nomadIdle.width)) / frameCount;
-    const frameHeight: f32 = @floatFromInt(nomadIdle.height);
-    const frameScaler = 5.0;
-    var frameCounter: f32 = 0;
+    var frameCounter: u8 = 0;
 
     var frameDelayCounter: u32 = 0;
 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    var nomadAssets = assets.AtlasLibrary.init(gpa.allocator());
+    defer nomadAssets.deinit();
+
+    try nomadAssets.parse("assets/nomad.rtpa");
+
     while (!rl.windowShouldClose()) : (frameDelayCounter += 1) {
+        const currentAnimation = nomadAssets.map.get("nomad-idle-back") orelse std.debug.panic("Couldn't find 'idle-front' animation of nomad!!", .{});
         // should use a proper timer later.
         if (frameDelayCounter == 10) {
             frameDelayCounter = 0;
-            frameCounter += 1.0;
+            frameCounter += 1;
+            if (frameCounter == currentAnimation.items.len) {
+                frameCounter = 0;
+            }
         }
+
+        const animationData = currentAnimation.items[frameCounter];
 
         rl.beginDrawing();
         defer rl.endDrawing();
@@ -36,10 +45,10 @@ pub fn main() anyerror!void {
         rl.clearBackground(rl.Color.white);
 
         rl.drawTexturePro(
-            nomadIdle,
-            .{ .x = frameCounter * frameWidth, .y = 0, .width = frameWidth, .height = frameHeight },
-            .{ .x = 10, .y = 10, .width = frameWidth * frameScaler, .height = frameHeight * frameScaler },
-            .{ .x = 32, .y = 0 },
+            nomadSprite,
+            animationData,
+            .{ .x = 10, .y = 10, .width = 32 * 5.0, .height = 32 * 5.0 },
+            .{ .x = 0, .y = 0 },
             0,
             rl.Color.white,
         );

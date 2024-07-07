@@ -3,18 +3,18 @@ const rl = @import("raylib");
 
 const AnimationData = std.ArrayList(rl.Rectangle);
 
-const AssetLibrary = struct {
+pub const AtlasLibrary = struct {
     map: std.StringHashMap(AnimationData),
     allocator: std.mem.Allocator,
 
-    pub fn init(allocator: std.mem.Allocator) AssetLibrary {
+    pub fn init(allocator: std.mem.Allocator) AtlasLibrary {
         return .{
             .allocator = allocator,
             .map = std.StringHashMap(AnimationData).init(allocator),
         };
     }
 
-    pub fn deinit(self: *AssetLibrary) void {
+    pub fn deinit(self: *AtlasLibrary) void {
         var it = self.map.iterator();
 
         while (it.next()) |data| {
@@ -23,7 +23,7 @@ const AssetLibrary = struct {
         self.map.deinit();
     }
 
-    pub fn parse(self: *AssetLibrary, comptime rtpaFile: []const u8) !void {
+    pub fn parse(self: *AtlasLibrary, comptime rtpaFile: []const u8) !void {
         const in = try std.fs.cwd().openFile(rtpaFile, .{});
         var bufferReader = std.io.bufferedReader(in.reader());
         var reader = bufferReader.reader();
@@ -96,8 +96,8 @@ const AssetLibrary = struct {
 // ==========================================================================
 const testing = @import("std").testing;
 const FLOAT_TOLERANCE = 0.001;
-test AssetLibrary {
-    var a = AssetLibrary.init(std.heap.c_allocator);
+test AtlasLibrary {
+    var a = AtlasLibrary.init(std.heap.c_allocator);
     defer a.deinit();
 
     try a.parse("assets/nomad.rtpa");
