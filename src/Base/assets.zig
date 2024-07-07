@@ -64,9 +64,8 @@ const AssetLibrary = struct {
             };
             const padding = try std.fmt.parseFloat(f32, it.next().?);
 
-            // ignore all other inputs and hope it won't be a problem :)
-            _ = origin;
-            _ = padding;
+            // Currently the algorithm will have to assume that there is no padding/origin-displacement, because I won't do that:
+            if (padding != 0.0 or origin.x != 0.0 or origin.y != 0.0) return ParseError.UnexpectedValue;
 
             const rec = rl.Rectangle{
                 .x = pos.x,
