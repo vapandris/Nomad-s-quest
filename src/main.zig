@@ -1,6 +1,6 @@
 const rl = @import("raylib");
 const std = @import("std");
-const assets = @import("Base/assets.zig");
+const atlas = @import("Base/atlas.zig");
 
 pub fn main() anyerror!void {
     const screenWidth = 800;
@@ -21,7 +21,7 @@ pub fn main() anyerror!void {
     var frameDelayCounter: u32 = 0;
 
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    var nomadAssets = assets.AtlasLibrary.init(gpa.allocator());
+    var nomadAssets = atlas.AtlasLibrary.init(gpa.allocator());
     defer nomadAssets.deinit();
 
     try nomadAssets.parse("assets/nomad.rtpa");
@@ -61,5 +61,5 @@ test "main" {
     _ = @import("Base/math.zig");
     _ = @import("Base/shapes.zig");
     _ = @import("Base/screen.zig");
-    _ = @import("Base/assets.zig");
+    _ = @import("Base/atlas.zig");
 }
