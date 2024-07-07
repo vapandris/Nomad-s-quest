@@ -5,6 +5,7 @@ const atlas = @import("Base/atlas.zig");
 const math = @import("Base/math.zig");
 const shapes = @import("Base/shapes.zig");
 const screen = @import("Base/screen.zig");
+const timer = @import("Base/timer.zig");
 
 const NomadState = union(enum) {
     idle,
@@ -13,6 +14,7 @@ const NomadState = union(enum) {
 
 pub const Nomad = struct {
     hitBox: shapes.Circle,
+    timer: timer.RepeateTimer,
 
     state: NomadState = .idle,
     frameCounter: u8 = 0,
@@ -22,12 +24,12 @@ pub const Nomad = struct {
 
         switch (self.state) {
             .idle => {
-                frameArray = assets.nomadAtlas.map.get("nomad-idle-front").?;
+                frameArray = assets.nomadAtlas.map.get("nomad-run-front").?;
             },
             .run => {},
         }
 
-        if (assets.hasAnimationTimerElapsed()) {
+        if (self.timer.loop()) {
             self.frameCounter += 1;
 
             if (self.frameCounter >= frameArray.items.len) {

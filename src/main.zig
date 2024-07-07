@@ -2,6 +2,7 @@ const rl = @import("raylib");
 const std = @import("std");
 const assets = @import("assets.zig");
 const nomad = @import("nomad.zig");
+const timer = @import("Base/timer.zig");
 
 pub fn main() anyerror!void {
     const screenWidth = 800;
@@ -16,16 +17,22 @@ pub fn main() anyerror!void {
     assets.init(gpa.allocator());
     defer assets.deinit();
 
-    var player = nomad.Nomad{ .hitBox = .{
-        .r = 50,
-        .pos = .{ .x = 30, .y = 50 },
-    } };
+    var player = nomad.Nomad{
+        .hitBox = .{
+            .r = 64,
+            .pos = .{ .x = 30, .y = 50 },
+        },
+        .timer = timer.RepeateTimer.start(150),
+    };
 
     while (!rl.windowShouldClose()) {
         if (rl.isKeyDown(.key_d)) player.hitBox.pos.x += 50 * rl.getFrameTime();
         if (rl.isKeyDown(.key_a)) player.hitBox.pos.x -= 50 * rl.getFrameTime();
         if (rl.isKeyDown(.key_s)) player.hitBox.pos.y += 50 * rl.getFrameTime();
         if (rl.isKeyDown(.key_w)) player.hitBox.pos.y -= 50 * rl.getFrameTime();
+
+        if (rl.getMouseWheelMove() > 0) assets.camera.zoom(rl.getFrameTime(), .in);
+        if (rl.getMouseWheelMove() < 0) assets.camera.zoom(rl.getFrameTime(), .out);
 
         rl.beginDrawing();
         defer rl.endDrawing();
