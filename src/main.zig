@@ -3,6 +3,7 @@ const std = @import("std");
 const assets = @import("assets.zig");
 const nomad = @import("nomad.zig");
 const timer = @import("Base/timer.zig");
+const math = @import("Base/math.zig");
 
 pub fn main() anyerror!void {
     const screenWidth = 800;
@@ -18,7 +19,7 @@ pub fn main() anyerror!void {
     defer assets.deinit();
 
     var player = nomad.Nomad{
-        .hitBox = .{
+        .hitCircle = .{
             .r = 64,
             .pos = .{ .x = 30, .y = 50 },
         },
@@ -28,10 +29,20 @@ pub fn main() anyerror!void {
     while (!rl.windowShouldClose()) {
         assets.loopAnimationTimer();
 
-        if (rl.isKeyDown(.key_d)) player.hitBox.pos.x += 50 * rl.getFrameTime();
-        if (rl.isKeyDown(.key_a)) player.hitBox.pos.x -= 50 * rl.getFrameTime();
-        if (rl.isKeyDown(.key_s)) player.hitBox.pos.y += 50 * rl.getFrameTime();
-        if (rl.isKeyDown(.key_w)) player.hitBox.pos.y -= 50 * rl.getFrameTime();
+        const speed = 48;
+        var dir = math.Vec2.ZERO;
+
+        if (rl.isKeyDown(.key_d)) dir.x += 1;
+        if (rl.isKeyDown(.key_a)) dir.x -= 1;
+        if (rl.isKeyDown(.key_s)) dir.y += 1;
+        if (rl.isKeyDown(.key_w)) dir.y -= 1;
+
+        if (dir.getLength() > 0) dir.normalize();
+
+        player.hitCircle.vel.x += dir.x * speed * rl.getFrameTime();
+        player.hitCircle.vel.y += dir.y * speed * rl.getFrameTime();
+
+        player.hitCircle.move(@floatFromInt(speed / 10), rl.getFrameTime());
 
         if (rl.getMouseWheelMove() > 0) assets.camera.zoom(rl.getFrameTime(), .in);
         if (rl.getMouseWheelMove() < 0) assets.camera.zoom(rl.getFrameTime(), .out);

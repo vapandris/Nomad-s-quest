@@ -21,6 +21,10 @@ pub const Vec2 = struct {
             .y = self.y / length,
         };
     }
+
+    pub fn normalize(self: *Vec2) void {
+        self.* = self.getNormal();
+    }
 };
 
 pub const Pos2 = struct {

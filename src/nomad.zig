@@ -13,7 +13,7 @@ const NomadState = union(enum) {
 };
 
 pub const Nomad = struct {
-    hitBox: shapes.Circle,
+    hitCircle: shapes.Circle,
     // timer: timer.RepeateTimer,
 
     state: NomadState = .idle,
@@ -40,9 +40,9 @@ pub const Nomad = struct {
         // define a rect where we should draw to:
         var rect = shapes.Rect{
             .pos = undefined,
-            .size = .{ .w = self.hitBox.r * 2, .h = self.hitBox.r * 2 },
+            .size = .{ .w = self.hitCircle.r * 2, .h = self.hitCircle.r * 2 },
         };
-        rect.setMidPoint(self.hitBox.pos);
+        rect.setMidPoint(self.hitCircle.pos);
 
         const screenRect = assets.camera.ScreenRectFromRect(rect, screen.getScreenSize());
 

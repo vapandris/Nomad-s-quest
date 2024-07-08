@@ -60,6 +60,23 @@ pub const Circle = struct {
 
         return distanceFromRect < circle.r;
     }
+
+    pub fn move(self: *Circle, friction: f32, frameDelta: f32) void {
+        self.acc.x = -self.vel.x * friction * frameDelta;
+        self.acc.y = -self.vel.y * friction * frameDelta;
+
+        self.vel.x += self.acc.x;
+        self.vel.y += self.acc.y;
+        self.pos.x += self.vel.x;
+        self.pos.y += self.vel.y;
+
+        const speed = (self.vel.x * self.vel.x) + (self.vel.y * self.vel.y);
+
+        if (@abs(speed) < 0.5) {
+            self.vel = .{ .x = 0, .y = 0 };
+            self.acc = .{ .x = 0, .y = 0 };
+        }
+    }
 };
 
 // ==========================================================================
