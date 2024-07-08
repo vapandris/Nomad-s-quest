@@ -14,7 +14,7 @@ const NomadState = union(enum) {
 
 pub const Nomad = struct {
     hitBox: shapes.Circle,
-    timer: timer.RepeateTimer,
+    // timer: timer.RepeateTimer,
 
     state: NomadState = .idle,
     frameCounter: u8 = 0,
@@ -29,7 +29,7 @@ pub const Nomad = struct {
             .run => {},
         }
 
-        if (self.timer.loop()) {
+        if (assets.animationTimerElapsed) {
             self.frameCounter += 1;
 
             if (self.frameCounter >= frameArray.items.len) {

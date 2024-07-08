@@ -36,14 +36,15 @@ pub const RepeateTimer = struct {
     pub fn loop(self: *RepeateTimer) bool {
         const looped = self.elapsed();
 
-        if (looped) self.*.timer.reset();
+        if (looped) self.timer.reset();
 
         return looped;
     }
 
     /// Returns in the timer has elapsed.
-    pub fn elapsed(self: *RepeateTimer) bool {
-        const since = self.timer.read();
+    pub fn elapsed(self: RepeateTimer) bool {
+        var measurer = self;
+        const since = measurer.timer.read();
 
         return convertMilliSecToNanoSec(self.period_ms) <= since;
     }

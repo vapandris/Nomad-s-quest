@@ -7,6 +7,7 @@ const screen = @import("Base/screen.zig");
 pub var camera: screen.Camera = undefined;
 
 var animationTimer: timer.RepeateTimer = undefined;
+pub var animationTimerElapsed = false;
 
 pub var nomadAtlas: atlas.AtlasLibrary = undefined;
 pub var nomadTextr: rl.Texture = undefined;
@@ -33,13 +34,7 @@ pub fn deinit() void {
     nomadAtlas.deinit();
 }
 
-/// Use this function to cehck if you should step forward the animated frame
-pub fn hasAnimationTimerElapsed() bool {
-    return animationTimer.elapsed();
-}
-
-/// Only use this function to loop around the animation timer.
-/// Should only be called once each frame.
+/// Should only be called once each frame, either at the beginning or the end of the loop
 pub fn loopAnimationTimer() void {
-    _ = animationTimer.loop();
+    animationTimerElapsed = animationTimer.loop();
 }

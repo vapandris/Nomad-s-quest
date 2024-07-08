@@ -22,10 +22,12 @@ pub fn main() anyerror!void {
             .r = 64,
             .pos = .{ .x = 30, .y = 50 },
         },
-        .timer = timer.RepeateTimer.start(150),
+        //.timer = timer.RepeateTimer.start(150),
     };
 
     while (!rl.windowShouldClose()) {
+        assets.loopAnimationTimer();
+
         if (rl.isKeyDown(.key_d)) player.hitBox.pos.x += 50 * rl.getFrameTime();
         if (rl.isKeyDown(.key_a)) player.hitBox.pos.x -= 50 * rl.getFrameTime();
         if (rl.isKeyDown(.key_s)) player.hitBox.pos.y += 50 * rl.getFrameTime();
@@ -40,8 +42,6 @@ pub fn main() anyerror!void {
         player.draw();
 
         rl.clearBackground(rl.Color.white);
-
-        assets.loopAnimationTimer();
     }
 }
 // ==========================================================================
