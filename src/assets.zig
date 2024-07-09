@@ -11,6 +11,8 @@ pub var animationTimerElapsed = false;
 
 pub var nomadAtlas: atlas.AtlasLibrary = undefined;
 pub var nomadTextr: rl.Texture = undefined;
+pub var ghoulAtlas: atlas.AtlasLibrary = undefined;
+pub var ghoulTextr: rl.Texture = undefined;
 
 pub fn init(allocator: std.mem.Allocator) void {
     animationTimer = timer.RepeateTimer.start(150);
@@ -23,11 +25,23 @@ pub fn init(allocator: std.mem.Allocator) void {
         },
     };
 
-    nomadAtlas = atlas.AtlasLibrary.init(allocator);
-    nomadAtlas.parse("assets/nomad.rtpa") catch |err| std.debug.panic("Error when parsing nomad.rtpa: {}\n", .{err});
+    // Nomad assets:
+    {
+        nomadAtlas = atlas.AtlasLibrary.init(allocator);
+        nomadAtlas.parse("assets/nomad.rtpa") catch |err| std.debug.panic("Error when parsing nomad.rtpa: {}\n", .{err});
 
-    nomadTextr = rl.loadTexture("assets/nomad.png");
-    if (nomadTextr.id <= 0) std.debug.print("Error when loading nomad.png\n", .{});
+        nomadTextr = rl.loadTexture("assets/nomad.png");
+        if (nomadTextr.id <= 0) std.debug.print("Error when loading nomad.png\n", .{});
+    }
+
+    // Ghoul assets:
+    {
+        ghoulAtlas = atlas.AtlasLibrary.init(allocator);
+        ghoulAtlas.parse("assets/ghoul.rtpa") catch |err| std.debug.panic("Error when parsing ghoul.rtpa: {}\n", .{err});
+
+        ghoulTextr = rl.loadTexture("assets/ghoul.png");
+        if (nomadTextr.id <= 0) std.debug.print("Error when loading ghoul.png\n", .{});
+    }
 }
 
 pub fn deinit() void {

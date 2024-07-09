@@ -1,0 +1,13 @@
+#
+# rTexPacker atlas descriptor file (v2.0)
+#
+# Number of packed sprites:     4
+#
+# Atlas info:    a <imagePath> <width> <height> <spriteCount> <isFont> <fontSize>
+# Sprite info:   s <nameId> <originX> <originY> <positionX> <positionY> <sourceWidth> <sourceHeight> <padding> <trimmed> <trimRecX> <trimRecY> <trimRecWidth> <trimRecHeight>
+#
+a ghoul.png 128 128 4 0 32
+s ghoul-run-front1 0 0 0 0 32 32 0 0 6 1 20 29
+s ghoul-run-front2 0 0 32 0 32 32 0 0 6 1 20 29
+s ghoul-run-front3 0 0 64 0 32 32 0 0 6 1 20 29
+s ghoul-run-front4 0 0 96 0 32 32 0 0 6 1 20 29
