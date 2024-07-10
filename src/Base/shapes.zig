@@ -61,12 +61,12 @@ pub const Circle = struct {
         return distanceFromRect < circle.r;
     }
 
-    pub fn move(self: *Circle, friction: f32, frameDelta: f32) void {
-        self.acc.x = -self.vel.x * friction * frameDelta;
-        self.acc.y = -self.vel.y * friction * frameDelta;
+    pub fn move(self: *Circle, frameDelta: f32) void {
+        self.acc.x = -self.vel.x * 0.8 * 12;
+        self.acc.y = -self.vel.y * 0.8 * 12;
 
-        self.vel.x += self.acc.x;
-        self.vel.y += self.acc.y;
+        self.vel.x += self.acc.x * frameDelta;
+        self.vel.y += self.acc.y * frameDelta;
         self.pos.x += self.vel.x;
         self.pos.y += self.vel.y;
 

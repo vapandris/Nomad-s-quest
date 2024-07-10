@@ -29,7 +29,6 @@ pub fn main() anyerror!void {
     while (!rl.windowShouldClose()) {
         assets.loopAnimationTimer();
 
-        const speed = 48;
         var dir = math.Vec2.ZERO;
 
         if (rl.isKeyDown(.key_d)) dir.x += 1;
@@ -37,12 +36,8 @@ pub fn main() anyerror!void {
         if (rl.isKeyDown(.key_s)) dir.y += 1;
         if (rl.isKeyDown(.key_w)) dir.y -= 1;
 
-        if (dir.getLength() > 0) dir.normalize();
-
-        player.hitCircle.vel.x += dir.x * speed * rl.getFrameTime();
-        player.hitCircle.vel.y += dir.y * speed * rl.getFrameTime();
-
-        player.hitCircle.move(@floatFromInt(speed / 10), rl.getFrameTime());
+        player.moveDirection = dir;
+        player.update(rl.getFrameTime());
 
         if (rl.getMouseWheelMove() > 0) assets.camera.zoom(rl.getFrameTime(), .in);
         if (rl.getMouseWheelMove() < 0) assets.camera.zoom(rl.getFrameTime(), .out);

@@ -14,10 +14,22 @@ const NomadState = union(enum) {
 
 pub const Nomad = struct {
     hitCircle: shapes.Circle,
-    // timer: timer.RepeateTimer,
+    moveDirection: math.Vec2 = .{ .x = 0, .y = 0 },
+    speed: f32 = 200,
 
     state: NomadState = .idle,
     frameCounter: u8 = 0,
+
+    pub fn update(self: *Nomad, frameDelta: f32) void {
+        if (self.moveDirection.getLength() != 0) self.moveDirection.normalize();
+        const dir = self.moveDirection;
+        const speed = self.speed;
+
+        self.hitCircle.vel.x += dir.x * speed * frameDelta;
+        self.hitCircle.vel.y += dir.y * speed * frameDelta;
+
+        self.hitCircle.move(frameDelta);
+    }
 
     pub fn draw(self: *Nomad) void {
         var frameArray: atlas.AnimationFrames = undefined;
