@@ -2,6 +2,7 @@ const rl = @import("raylib");
 const std = @import("std");
 const assets = @import("assets.zig");
 const nomad = @import("nomad.zig");
+const ghoul = @import("ghoul.zig");
 const timer = @import("Base/timer.zig");
 const math = @import("Base/math.zig");
 
@@ -18,13 +19,15 @@ pub fn main() anyerror!void {
     assets.init(gpa.allocator());
     defer assets.deinit();
 
-    var player = nomad.Nomad{
-        .hitCircle = .{
-            .r = 64,
-            .pos = .{ .x = 30, .y = 50 },
-        },
-        //.timer = timer.RepeateTimer.start(150),
-    };
+    var player = nomad.Nomad{ .hitCircle = .{
+        .r = 64,
+        .pos = .{ .x = 30, .y = 50 },
+    } };
+
+    var randomGhoul = ghoul.Ghoul{ .hitCircle = .{
+        .r = 64,
+        .pos = .{ .x = 100, .y = 100 },
+    } };
 
     while (!rl.windowShouldClose()) {
         assets.loopAnimationTimer();
@@ -36,6 +39,8 @@ pub fn main() anyerror!void {
         if (rl.isKeyDown(.key_s)) dir.y += 1;
         if (rl.isKeyDown(.key_w)) dir.y -= 1;
 
+        randomGhoul.move(player.hitCircle.pos, rl.getFrameTime());
+
         player.moveDirection = dir;
         player.update(rl.getFrameTime());
 
@@ -46,6 +51,7 @@ pub fn main() anyerror!void {
         defer rl.endDrawing();
 
         player.draw();
+        randomGhoul.draw();
 
         rl.clearBackground(rl.Color.white);
     }
