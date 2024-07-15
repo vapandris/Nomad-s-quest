@@ -1,8 +1,8 @@
 // !!! Important to note that the y axis increases downwards (just like the screen coord. system)
 
 pub const Vec2 = struct {
-    x: f32,
-    y: f32,
+    x: f32 = 0,
+    y: f32 = 0,
 
     pub const ZERO = Vec2{ .x = 0, .y = 0 };
 
@@ -12,8 +12,8 @@ pub const Vec2 = struct {
     }
 
     /// Get the normal vector of `self`
-    pub fn getNormal(self: Vec2) Vec2 {
-        if (self.x == 0 and self.y == 0) unreachable;
+    pub fn getNormal(self: Vec2) ?Vec2 {
+        if (self.x == 0 and self.y == 0) return null;
 
         const length = self.getLength();
         return .{
@@ -23,13 +23,21 @@ pub const Vec2 = struct {
     }
 
     pub fn normalize(self: *Vec2) void {
-        self.* = self.getNormal();
+        if (self.getNormal()) |normal| {
+            self.* = normal;
+        }
+    }
+
+    pub fn scale(self: *Vec2, scaler: f32) void {
+        self.normalize();
+        self.x *= scaler;
+        self.y *= scaler;
     }
 };
 
 pub const Pos2 = struct {
-    x: f32,
-    y: f32,
+    x: f32 = 0,
+    y: f32 = 0,
 
     pub const ZERO = Vec2{ .x = 0, .y = 0 };
 
@@ -250,21 +258,33 @@ test "vector_to" {
 test "vec2_normal" {
     // Test randomly picked vectors:
     const v1 = Vec2{ .x = 3, .y = 4 };
-    const n1 = v1.getNormal();
+    const n1 = v1.getNormal().?;
     try testing.expectApproxEqRel(0.6, n1.x, FLOAT_TOLERANCE);
     try testing.expectApproxEqRel(0.8, n1.y, FLOAT_TOLERANCE);
     try testing.expectApproxEqRel(1, n1.getLength(), FLOAT_TOLERANCE);
 
     const v2 = Vec2{ .x = 3000, .y = -4000 };
-    const n2 = v2.getNormal();
+    const n2 = v2.getNormal().?;
     try testing.expectApproxEqRel(n1.x, n2.x, FLOAT_TOLERANCE);
     try testing.expectApproxEqRel(-n1.y, n2.y, FLOAT_TOLERANCE);
     try testing.expectApproxEqRel(1, n2.getLength(), FLOAT_TOLERANCE);
 
     const v3 = Vec2{ .x = 1, .y = 0 };
-    const n3 = v3.getNormal();
+    const n3 = v3.getNormal().?;
     try testing.expectApproxEqRel(1, v3.getLength(), FLOAT_TOLERANCE);
     try testing.expectApproxEqRel(v3.x, n3.x, FLOAT_TOLERANCE);
     try testing.expectApproxEqRel(v3.y, n3.y, FLOAT_TOLERANCE);
     try testing.expectApproxEqRel(1, n3.getLength(), FLOAT_TOLERANCE);
+
+    const v4 = Vec2.ZERO;
+    const n4 = v4.getNormal();
+
+    try testing.expectEqual(null, n4);
+}
+
+test "vec2_scale" {
+    var v1 = Vec2{ .x = 3, .y = 4 };
+    v1.scale(5);
+
+    try testing.expectApproxEqRel(5, v1.getLength(), FLOAT_TOLERANCE);
 }
