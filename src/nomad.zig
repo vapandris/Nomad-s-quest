@@ -26,10 +26,13 @@ pub const Nomad = struct {
         const dir = self.moveDirection;
         const FPS = 60.0;
 
-        self.hitCircle.vel.x += dir.x * (acceleration * FPS) * frameDelta;
-        self.hitCircle.vel.y += dir.y * (acceleration * FPS) * frameDelta;
-
-        self.hitCircle.move((deceleration * FPS), maxSpeed, frameDelta);
+        self.hitCircle.move(
+            dir,
+            (acceleration * FPS),
+            (deceleration * FPS),
+            maxSpeed,
+            frameDelta,
+        ) catch unreachable;
     }
 
     pub fn draw(self: *Nomad) void {

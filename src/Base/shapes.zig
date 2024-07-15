@@ -61,11 +61,17 @@ pub const Circle = struct {
     }
 
     /// Move the given circle according to its velocity, and apply deceleration and consider its maxSpeed
-    /// - deceleration should not be greater than acceleration speed
-    /// TODO: make acceleration part of this function
-    pub fn move(self: *Circle, deceleration: f32, maxSpeed: ?f32, frameDelta: f32) void {
+    /// - direction is suggested to be normal vector
+    /// - acceleration is the speed of how much the circle moved in the given direction
+    /// - deceleration is the speed of how much the circle moves against the given direction
+    pub fn move(self: *Circle, direction: Vec2, acceleration: f32, deceleration: f32, maxSpeed: ?f32, frameDelta: f32) MovementError!void {
+        if (acceleration < deceleration) return MovementError.DecelerationIsGreaterThanAcceleration;
+
         // A vector pointing to the opposite direction of velocity:
         const decelerationVector = self.vel.getScaled(-1.0 * deceleration) orelse math.Vec2.ZERO;
+
+        self.vel.x += direction.x * acceleration * frameDelta;
+        self.vel.y += direction.y * acceleration * frameDelta;
 
         self.vel.x += decelerationVector.x * frameDelta;
         self.vel.y += decelerationVector.y * frameDelta;
@@ -82,6 +88,10 @@ pub const Circle = struct {
             self.vel = .{ .x = 0, .y = 0 };
         }
     }
+
+    const MovementError = error{
+        DecelerationIsGreaterThanAcceleration,
+    };
 };
 
 // ==========================================================================
