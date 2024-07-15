@@ -28,6 +28,14 @@ pub const Vec2 = struct {
         }
     }
 
+    pub fn getScaled(self: Vec2, scaler: f32) ?Vec2 {
+        var normal = self.getNormal() orelse return null;
+        normal.x *= scaler;
+        normal.y *= scaler;
+
+        return normal;
+    }
+
     pub fn scale(self: *Vec2, scaler: f32) void {
         self.normalize();
         self.x *= scaler;
@@ -283,8 +291,20 @@ test "vec2_normal" {
 }
 
 test "vec2_scale" {
-    var v1 = Vec2{ .x = 3, .y = 4 };
+    const v1_original = Vec2{ .x = 3, .y = 4 };
+    const n1_original = v1_original.getNormal().?;
+    var v1 = v1_original;
     v1.scale(5);
+    var n1 = v1.getNormal().?;
 
     try testing.expectApproxEqRel(5, v1.getLength(), FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(n1_original.x, n1.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(n1_original.y, n1.y, FLOAT_TOLERANCE);
+
+    v1.scale(-2);
+    n1 = v1.getNormal().?;
+
+    try testing.expectApproxEqRel(2, v1.getLength(), FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(-1.0 * n1_original.x, n1.x, FLOAT_TOLERANCE);
+    try testing.expectApproxEqRel(-1.0 * n1_original.y, n1.y, FLOAT_TOLERANCE);
 }

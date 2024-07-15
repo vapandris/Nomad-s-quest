@@ -1,11 +1,9 @@
-const std = @import("std");
 const rl = @import("raylib");
 const assets = @import("assets.zig");
 const atlas = @import("Base/atlas.zig");
 const math = @import("Base/math.zig");
 const shapes = @import("Base/shapes.zig");
 const screen = @import("Base/screen.zig");
-const timer = @import("Base/timer.zig");
 
 const NomadState = union(enum) {
     idle,
@@ -15,20 +13,23 @@ const NomadState = union(enum) {
 pub const Nomad = struct {
     hitCircle: shapes.Circle,
     moveDirection: math.Vec2 = .{ .x = 0, .y = 0 },
-    speed: f32 = 200,
 
     frameCounter: u8 = 0,
     state: NomadState = .idle,
 
+    const maxSpeed: f32 = 10;
+    const acceleration: f32 = 2.5;
+    const deceleration = acceleration / 2;
+
     pub fn update(self: *Nomad, frameDelta: f32) void {
-        if (self.moveDirection.getLength() != 0) self.moveDirection.normalize();
+        self.moveDirection.normalize();
         const dir = self.moveDirection;
-        const speed = self.speed;
+        const FPS = 60.0;
 
-        self.hitCircle.vel.x += dir.x * speed * frameDelta;
-        self.hitCircle.vel.y += dir.y * speed * frameDelta;
+        self.hitCircle.vel.x += dir.x * (acceleration * FPS) * frameDelta;
+        self.hitCircle.vel.y += dir.y * (acceleration * FPS) * frameDelta;
 
-        self.hitCircle.move(frameDelta);
+        self.hitCircle.move((deceleration * FPS), maxSpeed, frameDelta);
     }
 
     pub fn draw(self: *Nomad) void {

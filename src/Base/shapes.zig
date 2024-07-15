@@ -30,7 +30,6 @@ pub const Circle = struct {
     r: f32,
 
     vel: Vec2 = Vec2.ZERO,
-    acc: Vec2 = Vec2.ZERO,
 
     pub fn mass(self: Circle) f32 {
         return self.r * 10;
@@ -61,20 +60,26 @@ pub const Circle = struct {
         return distanceFromRect < circle.r;
     }
 
-    pub fn move(self: *Circle, frameDelta: f32) void {
-        self.acc.x = -self.vel.x * 0.8 * 12;
-        self.acc.y = -self.vel.y * 0.8 * 12;
+    /// Move the given circle according to its velocity, and apply deceleration and consider its maxSpeed
+    /// - deceleration should not be greater than acceleration speed
+    /// TODO: make acceleration part of this function
+    pub fn move(self: *Circle, deceleration: f32, maxSpeed: ?f32, frameDelta: f32) void {
+        // A vector pointing to the opposite direction of velocity:
+        const decelerationVector = self.vel.getScaled(-1.0 * deceleration) orelse math.Vec2.ZERO;
 
-        self.vel.x += self.acc.x * frameDelta;
-        self.vel.y += self.acc.y * frameDelta;
+        self.vel.x += decelerationVector.x * frameDelta;
+        self.vel.y += decelerationVector.y * frameDelta;
+
+        const speed = self.vel.getLength();
+        if (maxSpeed != null and maxSpeed.? < speed) {
+            self.vel.scale(maxSpeed.?);
+        }
+
         self.pos.x += self.vel.x;
         self.pos.y += self.vel.y;
 
-        const speed = (self.vel.x * self.vel.x) + (self.vel.y * self.vel.y);
-
-        if (@abs(speed) < 0.5) {
+        if (speed < 0.5) {
             self.vel = .{ .x = 0, .y = 0 };
-            self.acc = .{ .x = 0, .y = 0 };
         }
     }
 };
