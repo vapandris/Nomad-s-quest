@@ -19,11 +19,29 @@ pub const Camera = struct {
     /// Instantly move the camera to set the midle of the camera on `pos`
     pub fn focusOn(self: *Camera, pos: Pos2) void {
         const midleOfCamera = self.rect.getMidPoint();
+        const dir = midleOfCamera.getVectorTo(pos);
 
-        const delta = midleOfCamera.getVectorTo(pos);
+        self.rect.pos.x += dir.x;
+        self.rect.pos.y += dir.y;
+    }
 
-        self.*.rect.pos.x += delta.x;
-        self.*.rect.pos.y += delta.y;
+    /// Start moving toward a given position (trying to gradually center on it)
+    /// - The further away the `pos` is, the faster the movement.
+    /// - Once `pos` is close enough, it should just `focusOn` it
+    ///
+    /// - `frameDelta` is the time passed since last frame (if FPS is 60, it's usually around 0.016667 aka 1/60)
+    /// . `speed` is a multiplyer of how fast the camera should trawel with
+    pub fn follow(self: *Camera, pos: Pos2, speed: f32, frameDelta: f32) void {
+        const midleOfCamera = self.rect.getMidPoint();
+        const dir = midleOfCamera.getVectorTo(pos);
+
+        if (dir.getLength() < 0.5) {
+            self.rect.pos.x += dir.x;
+            self.rect.pos.y += dir.y;
+        } else {
+            self.rect.pos.x += math.nsqrt(dir.x) * speed * frameDelta;
+            self.rect.pos.y += math.nsqrt(dir.y) * speed * frameDelta;
+        }
     }
 
     /// Function shall calculate where to draw the given `gameRect` based on the position of `self: Camera` and the `screenSize`

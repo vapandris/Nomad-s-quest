@@ -37,6 +37,8 @@ pub fn main() anyerror!void {
         player.moveDirection = dir;
         player.update(rl.getFrameTime());
 
+        assets.camera.follow(player.getPositionForCameraToFollow(), 60, rl.getFrameTime());
+
         if (rl.getMouseWheelMove() > 0) assets.camera.zoom(rl.getFrameTime(), .in);
         if (rl.getMouseWheelMove() < 0) assets.camera.zoom(rl.getFrameTime(), .out);
 

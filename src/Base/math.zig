@@ -99,6 +99,11 @@ pub fn sqrt(num: f32) f32 {
     return num * y;
 }
 
+/// sqrt with the negative and 0 defined
+pub fn nsqrt(num: f32) f32 {
+    return if (num > 0) sqrt(num) else if (num < 0) -1 * sqrt(-num) else 0;
+}
+
 /// Fast random number generator by Lehmer
 /// https://en.wikipedia.org/wiki/Lehmer_random_number_generator
 pub fn rand() u64 {
