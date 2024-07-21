@@ -58,4 +58,5 @@ test "main" {
     _ = @import("Base/shapes.zig");
     _ = @import("Base/screen.zig");
     _ = @import("Base/atlas.zig");
+    _ = @import("level.zig");
 }
